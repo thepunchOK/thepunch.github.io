@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Punch - Dame tu golpe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #8b0000 0%, #dc143c 50%, #ff4500 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone-frame {
+            width: 360px;
+            height: 640px;
+            background: #2a2a2a;
+            border-radius: 35px;
+            padding: 15px;
+            box-shadow: 
+                0 20px 60px rgba(0,0,0,0.6),
+                inset 0 0 20px rgba(255,255,255,0.1),
+                inset -2px -2px 5px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #1a1a1a;
+            border-radius: 0 0 20px 20px;
+            z-index: 100;
+        }
+
+        .phone-frame::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            height: 35px;
+            border: 3px solid #444;
+            border-radius: 50%;
+            z-index: 100;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 30px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-top: 30px;
+        }
+
+        .phone-screen::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .phone-screen::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .phone-screen::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 3px;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 18px 12px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 0;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #dc143c 0%, #ff4500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+            font-weight: 900;
+        }
+
+        header p {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .post-form {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 12px rgba(220, 20, 60, 0.15);
+            border: 2px solid #dc143c;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            color: #8b0000;
+            margin-bottom: 6px;
+            font-size: 0.85em;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #ffb3ba;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #dc143c;
+            background: #fff0f1;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .mood-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 5px;
+        }
+
+        .mood-btn {
+            padding: 8px 12px;
+            border: 2px solid #ffb3ba;
+            background: white;
+            border-radius: 18px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .mood-btn:hover {
+            border-color: #dc143c;
+            transform: scale(1.1);
+        }
+
+        .mood-btn.selected {
+            background: linear-gradient(135deg, #dc143c 0%, #ff4500 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.4);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #dc143c 0%, #ff4500 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            box-shadow: 0 4px 12px rgba(220, 20, 60, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 20, 60, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .posts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .post {
+            background: white;
+            border-radius: 12px;
+            padding: 13px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid #dc143c;
+            margin-bottom: 10px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .post-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dc143c 0%, #ff4500 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.95em;
+            box-shadow: 0 2px 8px rgba(220, 20, 60, 0.3);
+        }
+
+        .post-info h3 {
+            color: #333;
+            font-size: 0.95em;
+            margin-bottom: 2px;
+        }
+
+        .post-info p {
+            color: #999;
+            font-size: 0.75em;
+        }
+
+        .post-content {
+            margin-bottom: 10px;
+        }
+
+        .post-text {
+            color: #333;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .mood-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffcdd2 0%, #ffb3ba 100%);
+            padding: 5px 11px;
+            border-radius: 18px;
+            font-size: 0.8em;
+            color: #8b0000;
+            font-weight: 700;
+            border: 1px solid #dc143c50;
+        }
+
+        .post-footer {
+            display: flex;
+            gap: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .post-footer span {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .post-footer span:hover {
+            color: #dc143c;
+            transform: scale(1.15);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #8b0000;
+            padding: 35px 20px;
+        }
+
+        .empty-state p {
+            font-size: 1em;
+            opacity: 0.8;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .phone-frame {
+                width: 100%;
+                max-width: 360px;
+                height: auto;
+                min-height: 85vh;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+
+            .post-form {
+                padding: 14px;
+            }
+
+            .mood-selector {
+                gap: 6px;
+            }
+
+            .mood-btn {
+                padding: 8px 10px;
+                font-size: 1em;
+            }
+
+            textarea {
+                min-height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="phone-screen">
+            <div class="container">
+                <header>
+                    <h1>🥊 The Punch</h1>
+                    <p>Dame tu golpe 💥</p>
+                </header>
+
+                <div class="post-form">
+                    <form id="postForm">
+                        <div class="form-group">
+                            <label for="name">Tu nombre</label>
+                            <input type="text" id="name" placeholder="¿Quién eres?" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mood">¿Cómo estás?</label>
+                            <input type="text" id="mood" placeholder="Ej: Furioso, Energético, Motivado..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="thought">Tu golpe de opinión</label>
+                            <textarea id="thought" placeholder="Suéltalo todo..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn">PUÑETAZO 🥊</button>
+                    </form>
+                </div>
+
+                <div class="posts-container" id="postsContainer">
+                    <div class="empty-state">
+                        <p>Sin puñetazos aún. ¡Sé el primero! 💥</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Limpiar posts anteriores
+        localStorage.removeItem('posts');
+        
+        // Estado
+        let posts = [];
+
+        // Funciones
+        function getInitials(name) {
+            return name
+                .split(' ')
+                .map(word => word[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2);
+        }
+
+        function getTimeAgo(timestamp) {
+            const now = new Date().getTime();
+            const diff = now - timestamp;
+            const seconds = Math.floor(diff / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (seconds < 60) return 'Ahora';
+            if (minutes < 60) return `Hace ${minutes}m`;
+            if (hours < 24) return `Hace ${hours}h`;
+            if (days < 7) return `Hace ${days}d`;
+            
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('postsContainer');
+
+            if (posts.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>Sin puñetazos aún. ¡Sé el primero! 💥</p></div>';
+                return;
+            }
+
+            container.innerHTML = posts
+                .sort((a, b) => b.timestamp - a.timestamp)
+                .map(post => `
+                    <div class="post">
+                        <div class="post-header">
+                            <div class="post-avatar">${getInitials(post.name)}</div>
+                            <div class="post-info">
+                                <h3>${escapeHtml(post.name)}</h3>
+                                <p>${getTimeAgo(post.timestamp)}</p>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            <p class="post-text">${escapeHtml(post.thought)}</p>
+                            <span class="mood-tag">${escapeHtml(post.mood)}</span>
+                        </div>
+                        <div class="post-footer">
+                            <span>❤️ Gusta</span>
+                            <span>💬 Comenta</span>
+                            <span>📤 Comparte</span>
+                        </div>
+                    </div>
+                `)
+                .join('');
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Event listeners
+        document.getElementById('postForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const mood = document.getElementById('mood').value.trim();
+
+            if (!mood) {
+                alert('Escribe cómo estás');
+                return;
+            }
+
+            const newPost = {
+                id: Date.now(),
+                name: document.getElementById('name').value,
+                thought: document.getElementById('thought').value,
+                mood: mood,
+                timestamp: Date.now()
+            };
+
+            posts.push(newPost);
+
+            // Reset form
+            document.getElementById('postForm').reset();
+
+            renderPosts();
+        });
+
+        // Inicializar
+        renderPosts();
+    </script>
+</body>
+</html>
